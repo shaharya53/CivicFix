@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -16,8 +16,14 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
 
   // If already logged in, redirect to home
+  useEffect(() => {
+    if (user) {
+      router.push('/');
+    }
+  }, [user, router]);
+
   if (user) {
-    router.push('/');
+    return null;
   }
 
   const handleSubmit = async (e) => {
