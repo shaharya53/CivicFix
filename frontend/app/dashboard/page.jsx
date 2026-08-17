@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import { useReports } from '../../hooks/useReports';
 import ProtectedRoute from '../../components/civic/ProtectedRoute';
@@ -14,10 +14,27 @@ function CitizenDashboardContent() {
   const { user, logout } = useAuth();
   const { reports, loading, error, fetchMyReports } = useReports();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const reportId = searchParams.get('reportId');
 
   useEffect(() => {
     fetchMyReports();
   }, []);
+
+  useEffect(() => {
+    if (reportId && !loading) {
+      setTimeout(() => {
+        const element = document.getElementById(`issue-card-${reportId}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.classList.add('ring-4', 'ring-teal-500', 'ring-opacity-50', 'bg-teal-50/10');
+          setTimeout(() => {
+            element.classList.remove('ring-4', 'ring-teal-500', 'ring-opacity-50', 'bg-teal-50/10');
+          }, 4000);
+        }
+      }, 600);
+    }
+  }, [reportId, loading]);
 
   const totalReports = reports.length;
   const pendingReports = reports.filter(r => r.status.toUpperCase() !== 'RESOLVED' && r.status.toUpperCase() !== 'CLOSED').length;
@@ -145,7 +162,9 @@ function CitizenDashboardContent() {
             {!loading && reports.length > 0 && (
               <div className="space-y-4">
                 {reports.map((report) => (
-                  <IssueCard key={report.id} issue={report} />
+                  <div key={report.id} id={`issue-card-${report.id}`} className="transition duration-300 rounded-xl p-1">
+                    <IssueCard issue={report} />
+                  </div>
                 ))}
               </div>
             )}

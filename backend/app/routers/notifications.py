@@ -37,30 +37,15 @@ def list_my_notifications(
     # Note: frontend expects type, report_id, link, is_read, so we provide default values or map links.
     notifications_list = []
     for n in results:
-        # Determine deep-link metadata dynamically or parse if stored
-        link = None
-        noti_type = "SYSTEM"
-        report_id = None
-        
-        # Simple heuristics based on message contents
-        if "assigned" in n.message.lower() or "worker" in n.message.lower():
-            noti_type = "REPORT_ASSIGNED"
-            link = f"/worker/tasks"
-        elif "status" in n.message.lower() or "resolved" in n.message.lower():
-            noti_type = "REPORT_STATUS_CHANGED"
-            link = f"/dashboard"
-        elif "submitted" in n.message.lower() or "new report" in n.message.lower():
-            noti_type = "REPORT_CREATED"
-            link = f"/admin/dashboard"
-
         notifications_list.append({
             "id": n.id,
-            "type": noti_type,
+            "type": n.type,
             "title": n.title,
             "message": n.message,
             "is_read": n.read,
-            "link": link,
-            "report_id": report_id,
+            "link": n.link,
+            "report_id": n.report_id,
+            "task_id": n.task_id,
             "created_at": n.created_at.isoformat() if n.created_at else None
         })
 
@@ -101,6 +86,7 @@ def mark_notification_as_read(
         )
 
     notification.read = True
+    notification.read_at = datetime.utcnow()
     db.commit()
     return {"message": "Notification marked as read"}
 
@@ -117,6 +103,7 @@ def mark_all_as_read(
 
     for n in unread_notifications:
         n.read = True
+        n.read_at = datetime.utcnow()
     
     db.commit()
     return {"message": "All notifications marked as read"}

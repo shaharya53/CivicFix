@@ -184,7 +184,7 @@ async def start_task(
             title="Work Progress Started",
             message=f"A worker has started repairing your report CF-2026-{str(report.id).zfill(6)}.",
             report_id=report.id,
-            link="/dashboard"
+            link=f"/dashboard?reportId={report.id}"
         ))
     except Exception as e:
         logger.error(f"Failed to trigger reporter notification on task start: {str(e)}")
@@ -280,7 +280,7 @@ async def resolve_task(
             title="Issue Resolved",
             message=f"Your report CF-2026-{str(report.id).zfill(6)} has been resolved.",
             report_id=report.id,
-            link="/dashboard"
+            link=f"/dashboard?reportId={report.id}"
         ))
     except Exception as e:
         logger.error(f"Failed to trigger reporter notification on task resolve: {str(e)}")

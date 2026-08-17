@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchAPI } from '../../../lib/api';
 import CivicMap from '../../../components/civic/CivicMap';
+import { useSearchParams } from 'next/navigation';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 const WS_URL = API_URL.replace('http://', 'ws://').replace('https://', 'wss://') + '/ws/live';
@@ -23,9 +24,18 @@ export default function WorkerDashboard() {
   const [resolutionImagePreview, setResolutionImagePreview] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
+  const searchParams = useSearchParams();
+  const taskId = searchParams.get('taskId');
+
   useEffect(() => {
     fetchTasks();
   }, [activeTab]);
+
+  useEffect(() => {
+    if (taskId) {
+      fetchTaskDetails(taskId);
+    }
+  }, [taskId]);
 
   const fetchTasks = async () => {
     try {

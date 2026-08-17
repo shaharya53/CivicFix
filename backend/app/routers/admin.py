@@ -296,7 +296,7 @@ async def update_report_status(
             title="Report Status Updated",
             message=f"Your report CF-2026-{str(report.id).zfill(6)} is now in state {next_status}.",
             report_id=report.id,
-            link="/dashboard"
+            link=f"/dashboard?reportId={report.id}"
         ))
     except Exception as e:
         logger.error(f"Failed to trigger status change notification: {str(e)}")
@@ -384,7 +384,7 @@ async def assign_report(
                 title="New Assignment",
                 message=f"Task CF-2026-{str(report.id).zfill(6)} has been assigned to you.",
                 report_id=report.id,
-                link=f"/worker/tasks/{report.id}"
+                link=f"/worker/dashboard?taskId={report.id}"
             ))
         except Exception as e:
             logger.error(f"Failed to trigger worker assignment notification: {str(e)}")

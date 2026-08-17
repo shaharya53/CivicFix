@@ -108,10 +108,15 @@ class Notification(Base):
     __tablename__ = "notifications"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    type = Column(String(50), default="SYSTEM", nullable=False)
     title = Column(String(255), nullable=False)
     message = Column(Text, nullable=False)
+    report_id = Column(Integer, ForeignKey("reports.id"), nullable=True)
+    task_id = Column(Integer, nullable=True)
+    link = Column(String(255), nullable=True)
     read = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    read_at = Column(DateTime, nullable=True)
 
     # Relationships
     user = relationship("User", back_populates="notifications")

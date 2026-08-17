@@ -203,3 +203,39 @@ def test_notification_failure_resiliency(client, citizen_headers, db_session):
         # Verify report exists in DB
         report_exists = db_session.query(Report).filter(Report.category == "pothole").first()
         assert report_exists is not None
+
+
+def test_notification_schema_properties(client, citizen_headers, db_session):
+    cit_user = db_session.query(User).filter(User.email == "noti_citizen@example.com").first()
+    
+    noti = Notification(
+        user_id=cit_user.id,
+        type="REPORT_ASSIGNED",
+        title="New Task Assigned",
+        message="A new task has been assigned to you.",
+        report_id=None,
+        task_id=456,
+        link="/worker/dashboard?taskId=456",
+        read=False
+    )
+    db_session.add(noti)
+    db_session.commit()
+    db_session.refresh(noti)
+    
+    # Query API
+    resp = client.get("/api/notifications", cookies=citizen_headers)
+    assert resp.status_code == 200
+    data = resp.json()["notifications"][0]
+    
+    assert data["type"] == "REPORT_ASSIGNED"
+    assert data["link"] == "/worker/dashboard?taskId=456"
+    assert data["task_id"] == 456
+    assert data["is_read"] is False
+    
+    # Mark read and check read_at is updated
+    read_resp = client.put(f"/api/notifications/{noti.id}/read", cookies=citizen_headers)
+    assert read_resp.status_code == 200
+    
+    db_session.refresh(noti)
+    assert noti.read is True
+    assert noti.read_at is not None

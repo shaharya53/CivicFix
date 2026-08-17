@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { fetchAPI } from '../../../lib/api';
 import CivicMap from '../../../components/civic/CivicMap';
 import AdminDetailDrawer from '../../../components/civic/AdminDetailDrawer';
+import { useSearchParams } from 'next/navigation';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 const WS_URL = API_URL.replace('http://', 'ws://').replace('https://', 'wss://') + '/ws/live';
@@ -37,10 +38,19 @@ export default function AdminDashboard() {
   // Selected report in drawer
   const [selectedReportId, setSelectedReportId] = useState(null);
 
+  const searchParams = useSearchParams();
+  const reportId = searchParams.get('reportId');
+
   // Fetch stats and reports list
   useEffect(() => {
     fetchStats();
   }, []);
+
+  useEffect(() => {
+    if (reportId) {
+      setSelectedReportId(Number(reportId));
+    }
+  }, [reportId]);
 
   useEffect(() => {
     fetchReportsList();

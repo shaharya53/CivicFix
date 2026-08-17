@@ -25,12 +25,14 @@ async def notify_user(
         # 1. Create and save database record (source of truth)
         db_noti = Notification(
             user_id=user_id,
+            type=noti_type,
             title=title,
             message=message,
-            read=False,
-            # We can map standard attributes to keep it modular
+            report_id=report_id,
+            task_id=task_id,
+            link=link,
+            read=False
         )
-        # Store extra payload properties directly if database schema permits
         db.add(db_noti)
         db.commit()
         db.refresh(db_noti)

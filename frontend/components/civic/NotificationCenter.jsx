@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { fetchAPI } from '../../lib/api';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 const WS_URL = API_URL.replace('http://', 'ws://').replace('https://', 'wss://') + '/ws/live';
 
 export default function NotificationCenter() {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -106,16 +108,11 @@ export default function NotificationCenter() {
   const handleMarkRead = async (notiId, e) => {
     e.stopPropagation();
     try {
-      const res = await fetch(`${API_URL}/api/notifications/${notiId}/read`, {
-        method: 'PUT',
-        credentials: 'include'
-      });
-      if (res.ok) {
-        setUnreadCount((c) => Math.max(c - 1, 0));
-        setNotifications((prev) => 
-          prev.map((n) => n.id === notiId ? { ...n, is_read: true } : n)
-        );
-      }
+      await fetchAPI(`/api/notifications/${notiId}/read`, { method: 'PUT' });
+      setUnreadCount((c) => Math.max(c - 1, 0));
+      setNotifications((prev) => 
+        prev.map((n) => n.id === notiId ? { ...n, is_read: true } : n)
+      );
     } catch (err) {
       console.error('Failed to mark read:', err);
     }
@@ -123,14 +120,9 @@ export default function NotificationCenter() {
 
   const handleMarkAllRead = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/notifications/read-all`, {
-        method: 'PUT',
-        credentials: 'include'
-      });
-      if (res.ok) {
-        setUnreadCount(0);
-        setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
-      }
+      await fetchAPI('/api/notifications/read-all', { method: 'PUT' });
+      setUnreadCount(0);
+      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
     } catch (err) {
       console.error('Failed to mark all read:', err);
     }
@@ -140,10 +132,7 @@ export default function NotificationCenter() {
     // 1. Mark as read
     if (!noti.is_read) {
       try {
-        await fetch(`${API_URL}/api/notifications/${noti.id}/read`, {
-          method: 'PUT',
-          credentials: 'include'
-        });
+        await fetchAPI(`/api/notifications/${noti.id}/read`, { method: 'PUT' });
         setUnreadCount((c) => Math.max(c - 1, 0));
         setNotifications((prev) => 
           prev.map((n) => n.id === noti.id ? { ...n, is_read: true } : n)
@@ -155,7 +144,7 @@ export default function NotificationCenter() {
     
     // 2. Perform redirect link action
     if (noti.link) {
-      window.location.href = noti.link;
+      router.push(noti.link);
     }
     setIsOpen(false);
   };

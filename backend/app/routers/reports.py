@@ -260,7 +260,7 @@ async def create_report(
             title="New Report Submitted",
             message=f"A new {report.category} issue was reported at {report.address or 'Ahmedabad'}.",
             report_id=report.id,
-            link=f"/admin/reports/{report.id}"
+            link=f"/admin/dashboard?reportId={report.id}"
         ))
 
         # Check AI review queue conditions
@@ -272,7 +272,7 @@ async def create_report(
                 title="AI Review Required",
                 message=f"Report CF-2026-{str(report.id).zfill(6)} has low confidence and requires review.",
                 report_id=report.id,
-                link=f"/admin/reports/{report.id}"
+                link=f"/admin/dashboard?reportId={report.id}"
             ))
     except Exception as e:
         logger.error(f"Failed to schedule submission notifications: {str(e)}")
