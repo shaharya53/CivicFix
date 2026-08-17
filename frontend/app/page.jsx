@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import CivicMap from '../components/civic/CivicMap';
 import { fetchAPI } from '../lib/api';
 
@@ -39,16 +40,16 @@ export default function Home() {
           </div>
           
           <nav className="hidden md:flex space-x-8 text-sm font-medium text-neutral-600">
-            <a href="#" className="text-teal-600 hover:text-teal-700 transition">Dashboard</a>
-            <a href="#" className="hover:text-neutral-900 transition">Reports</a>
+            <Link href="/dashboard" className="text-teal-600 hover:text-teal-700 transition">Dashboard</Link>
+            <Link href="/dashboard" className="hover:text-neutral-900 transition">Reports</Link>
             <a href="#" className="hover:text-neutral-900 transition">AI Center</a>
           </nav>
 
           <div className="flex items-center space-x-4">
-            <button className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-neutral-900">Log In</button>
-            <button className="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 shadow-sm transition">
+            <Link href="/login" className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-neutral-900 transition">Log In</Link>
+            <Link href="/report" className="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 shadow-sm transition text-center">
               Report a Problem
-            </button>
+            </Link>
           </div>
         </div>
       </header>
@@ -65,10 +66,10 @@ export default function Home() {
             <p className="mt-3 text-neutral-500 text-sm leading-relaxed">
               Report potholes, garbage, or broken utilities in seconds. CivicFix AI analyzes the evidence, predict severity, and routes reports to departments.
             </p>
-            <button className="mt-6 w-full py-3 bg-teal-600 text-white font-semibold rounded-lg hover:bg-teal-700 shadow transition flex items-center justify-center space-x-2">
+            <Link href="/report" className="mt-6 w-full py-3 bg-teal-600 text-white font-semibold rounded-lg hover:bg-teal-700 shadow transition flex items-center justify-center space-x-2">
               <span>📷</span>
               <span>Report a Problem Now</span>
-            </button>
+            </Link>
           </div>
 
           {/* System Health Check Container */}
