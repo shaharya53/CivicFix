@@ -4,6 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import ProtectedRoute from '../../components/civic/ProtectedRoute';
+import NotificationCenter from '../../components/civic/NotificationCenter';
 
 export default function WorkerLayout({ children }) {
   const { user, logout } = useAuth();
@@ -31,6 +32,7 @@ export default function WorkerLayout({ children }) {
           </div>
 
           <div className="flex items-center space-x-3 text-xs">
+            <NotificationCenter />
             <span className="hidden sm:inline-block text-neutral-400 font-mono truncate max-w-[120px]">{user?.email}</span>
             <button 
               onClick={handleLogout}

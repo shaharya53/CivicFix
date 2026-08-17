@@ -8,6 +8,7 @@ import { useReports } from '../../hooks/useReports';
 import ProtectedRoute from '../../components/civic/ProtectedRoute';
 import CivicMap from '../../components/civic/CivicMap';
 import IssueCard from '../../components/civic/IssueCard';
+import NotificationCenter from '../../components/civic/NotificationCenter';
 
 function CitizenDashboardContent() {
   const { user, logout } = useAuth();
@@ -46,6 +47,7 @@ function CitizenDashboardContent() {
           </div>
 
           <div className="flex items-center space-x-4">
+            <NotificationCenter />
             <div className="text-right hidden sm:block">
               <p className="text-sm font-semibold text-neutral-900">{user?.email}</p>
               <p className="text-xs text-neutral-400 font-medium">Role: {user?.role}</p>

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import ProtectedRoute from '../../components/civic/ProtectedRoute';
+import NotificationCenter from '../../components/civic/NotificationCenter';
 
 export default function AdminLayout({ children }) {
   return (
@@ -40,7 +41,18 @@ export default function AdminLayout({ children }) {
         
         {/* Admin Main Body */}
         <main className="flex-1 flex flex-col overflow-y-auto">
-          {children}
+          {/* Top Admin Header with Notification Bell */}
+          <header className="bg-white border-b border-neutral-200 px-6 py-3.5 flex items-center justify-between sticky top-0 z-20 shadow-sm">
+            <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider">CivicFix Control Panel</span>
+            <div className="flex items-center space-x-4">
+              <NotificationCenter />
+              <span className="text-xs font-semibold text-neutral-600">Admin Mode</span>
+            </div>
+          </header>
+          
+          <div className="flex-1">
+            {children}
+          </div>
         </main>
       </div>
     </ProtectedRoute>

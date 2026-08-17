@@ -172,6 +172,23 @@ async def start_task(
     db.commit()
     db.refresh(report)
 
+    # Dispatch Real-time notification to reporter (Database-first, non-blocking)
+    try:
+        import asyncio
+        from app.services import notifications
+        
+        asyncio.create_task(notifications.notify_user(
+            db=db,
+            user_id=report.reporter_id,
+            noti_type="TASK_STARTED",
+            title="Work Progress Started",
+            message=f"A worker has started repairing your report CF-2026-{str(report.id).zfill(6)}.",
+            report_id=report.id,
+            link="/dashboard"
+        ))
+    except Exception as e:
+        logger.error(f"Failed to trigger reporter notification on task start: {str(e)}")
+
     # Broadcast event
     try:
         import asyncio
@@ -250,6 +267,23 @@ async def resolve_task(
     db.add(history)
     db.commit()
     db.refresh(report)
+
+    # Dispatch Real-time notification to reporter (Database-first, non-blocking)
+    try:
+        import asyncio
+        from app.services import notifications
+        
+        asyncio.create_task(notifications.notify_user(
+            db=db,
+            user_id=report.reporter_id,
+            noti_type="TASK_RESOLVED",
+            title="Issue Resolved",
+            message=f"Your report CF-2026-{str(report.id).zfill(6)} has been resolved.",
+            report_id=report.id,
+            link="/dashboard"
+        ))
+    except Exception as e:
+        logger.error(f"Failed to trigger reporter notification on task resolve: {str(e)}")
 
     # Broadcast event
     try:

@@ -9,7 +9,7 @@ from sqlalchemy import text
 from app.database import get_db
 from app import schemas, auth
 from app.models import User, Report, Evidence, ReportStatusHistory, AIPrediction, AICorrection
-from app.services import storage, ai_client
+from app.services import storage, ai_client, notifications
 from app.websocket import manager
 
 router = APIRouter(prefix="/reports", tags=["Reports"])
@@ -249,6 +249,33 @@ async def create_report(
 
     db.commit()
     db.refresh(report)
+
+    # 6b. Dispatch Real-time Notification alerts (Database-first, non-blocking)
+    try:
+        import asyncio
+        # Notify admins of new report submission
+        asyncio.create_task(notifications.notify_admins(
+            db=db,
+            noti_type="REPORT_CREATED",
+            title="New Report Submitted",
+            message=f"A new {report.category} issue was reported at {report.address or 'Ahmedabad'}.",
+            report_id=report.id,
+            link=f"/admin/reports/{report.id}"
+        ))
+
+        # Check AI review queue conditions
+        latest_pred = db.query(AIPrediction).filter(AIPrediction.report_id == report.id).first()
+        if not latest_pred or latest_pred.confidence < 0.8:
+            asyncio.create_task(notifications.notify_admins(
+                db=db,
+                noti_type="AI_REVIEW_REQUIRED",
+                title="AI Review Required",
+                message=f"Report CF-2026-{str(report.id).zfill(6)} has low confidence and requires review.",
+                report_id=report.id,
+                link=f"/admin/reports/{report.id}"
+            ))
+    except Exception as e:
+        logger.error(f"Failed to schedule submission notifications: {str(e)}")
 
     # 7. WebSocket Live Notification (Non-blocking)
     try:

@@ -280,6 +280,27 @@ async def update_report_status(
     db.commit()
     db.refresh(report)
 
+    # Dispatch Real-time notification to citizen reporter (Database-first, non-blocking)
+    try:
+        import asyncio
+        from app.services import notifications
+        
+        noti_type = "REPORT_STATUS_CHANGED"
+        if next_status == "REOPENED":
+            noti_type = "REPORT_REOPENED"
+            
+        asyncio.create_task(notifications.notify_user(
+            db=db,
+            user_id=report.reporter_id,
+            noti_type=noti_type,
+            title="Report Status Updated",
+            message=f"Your report CF-2026-{str(report.id).zfill(6)} is now in state {next_status}.",
+            report_id=report.id,
+            link="/dashboard"
+        ))
+    except Exception as e:
+        logger.error(f"Failed to trigger status change notification: {str(e)}")
+
     # Broadcast event
     try:
         import asyncio
@@ -349,6 +370,24 @@ async def assign_report(
     report.updated_at = datetime.utcnow()
     db.commit()
     db.refresh(report)
+
+    # Dispatch Real-time notification to the assigned worker (Database-first, non-blocking)
+    if report.assigned_worker_id:
+        try:
+            import asyncio
+            from app.services import notifications
+            
+            asyncio.create_task(notifications.notify_user(
+                db=db,
+                user_id=report.assigned_worker_id,
+                noti_type="REPORT_ASSIGNED",
+                title="New Assignment",
+                message=f"Task CF-2026-{str(report.id).zfill(6)} has been assigned to you.",
+                report_id=report.id,
+                link=f"/worker/tasks/{report.id}"
+            ))
+        except Exception as e:
+            logger.error(f"Failed to trigger worker assignment notification: {str(e)}")
 
     # Broadcast event
     try:
