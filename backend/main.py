@@ -9,7 +9,7 @@ from jose import jwt, JWTError
 from app.config import settings
 from app.database import init_db, get_db
 from fastapi.staticfiles import StaticFiles
-from app.routers import auth, reports
+from app.routers import auth, reports, admin
 from app.websocket import manager
 
 app = FastAPI(title="CivicFix Core Backend API", version="1.0.0")
@@ -39,6 +39,7 @@ def startup_event():
 # Register API Routers
 app.include_router(auth.router, prefix="/api")
 app.include_router(reports.router, prefix="/api")
+app.include_router(admin.router, prefix="/api")
 
 # Serve uploaded static files
 import os

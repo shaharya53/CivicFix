@@ -18,17 +18,17 @@ export default function AdminLayout({ children }) {
             </div>
             
             <nav className="space-y-1 text-sm font-medium">
-              <a href="#" className="flex items-center space-x-2.5 py-2 px-3 rounded-lg bg-teal-600/10 text-teal-500 transition">
+              <a href="/admin/dashboard" className="flex items-center space-x-2.5 py-2 px-3 rounded-lg hover:bg-neutral-800/50 hover:text-white transition">
                 <span>📊</span>
                 <span>Dashboard</span>
               </a>
-              <a href="#" className="flex items-center space-x-2.5 py-2 px-3 rounded-lg hover:bg-neutral-800/50 hover:text-white transition">
-                <span>📋</span>
-                <span>Reports</span>
+              <a href="/admin/map" className="flex items-center space-x-2.5 py-2 px-3 rounded-lg hover:bg-neutral-800/50 hover:text-white transition">
+                <span>🗺️</span>
+                <span>Interactive Map</span>
               </a>
-              <a href="#" className="flex items-center space-x-2.5 py-2 px-3 rounded-lg hover:bg-neutral-800/50 hover:text-white transition">
-                <span>🤖</span>
-                <span>AI Center</span>
+              <a href="/dashboard" className="flex items-center space-x-2.5 py-2 px-3 rounded-lg hover:bg-neutral-800/50 hover:text-white transition">
+                <span>👤</span>
+                <span>Citizen View</span>
               </a>
             </nav>
           </div>

@@ -121,3 +121,17 @@ class ReportOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+class StatusUpdate(BaseModel):
+    status: str
+    comment: Optional[str] = None
+
+class AssignmentUpdate(BaseModel):
+    department_id: Optional[int] = None
+    assigned_worker_id: Optional[int] = None
+
+class CorrectionUpdate(BaseModel):
+    category: str
+    severity: str
+    reason: Optional[str] = None
+
