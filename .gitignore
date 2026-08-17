@@ -1,0 +1,33 @@
+# Dependency directories
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+
+# Next.js build output and cache
+.next/
+out/
+build/
+dist/
+
+# Local env files (keep template .env.example, ignore active config)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local volume mounts
+postgres_data/
+redis_data/
+ai_models/
+uploads/
