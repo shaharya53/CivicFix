@@ -1,26 +1,33 @@
 import datetime
 from typing import Optional, List
+import bcrypt
 from fastapi import Request, Depends, HTTPException, status
 from fastapi.security import APIKeyCookie
 from jose import jwt, JWTError
-from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.database import get_db
 from app.models import User
 
-# Password hashing configuration
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 # Cookie authentication readers
 access_token_cookie = APIKeyCookie(name="access_token", auto_error=False)
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    # Hash password directly using bcrypt package
+    pwd_bytes = password.encode('utf-8')
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(pwd_bytes, salt)
+    return hashed.decode('utf-8')
 
 def verify_password(password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(password, hashed_password)
+    # Verify password directly using bcrypt package
+    try:
+        pwd_bytes = password.encode('utf-8')
+        hashed_bytes = hashed_password.encode('utf-8')
+        return bcrypt.checkpw(pwd_bytes, hashed_bytes)
+    except Exception:
+        return False
 
 def create_access_token(data: dict, expires_delta: Optional[datetime.timedelta] = None) -> str:
     to_encode = data.copy()

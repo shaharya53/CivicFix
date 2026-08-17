@@ -21,6 +21,14 @@ class EmbedRequest(BaseModel):
 class EmbedResponse(BaseModel):
     embedding: List[float]
 
+@app.get("/")
+def read_root():
+    return {
+        "name": "CivicFix AI Service",
+        "version": "1.0.0",
+        "status": "active"
+    }
+
 @app.get("/health")
 def health():
     return {"status": "healthy"}

@@ -1,9 +1,22 @@
+import os
 import datetime
-from sqlalchemy import Column, Integer, String, Text, Float, DateTime, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, Text, Float, DateTime, ForeignKey, Boolean, create_engine, text
 from sqlalchemy.orm import relationship
 from pgvector.sqlalchemy import Vector
 from geoalchemy2 import Geometry
 from app.database import Base
+
+# Conditionally check if PostGIS is available on startup
+db_url = os.environ.get("DATABASE_URL", "postgresql://civicfix_user:civicfix_secure_pass_2026@127.0.0.1:5432/civicfix_db")
+has_postgis = False
+try:
+    engine = create_engine(db_url)
+    with engine.connect() as conn:
+        res = conn.execute(text("SELECT 1 FROM pg_type WHERE typname = 'geometry'")).scalar()
+        if res == 1:
+            has_postgis = True
+except Exception:
+    pass
 
 class User(Base):
     __tablename__ = "users"
@@ -29,6 +42,13 @@ class Department(Base):
     # Relationships
     reports = relationship("Report", back_populates="department")
 
+class Category(Base):
+    __tablename__ = "categories"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), unique=True, nullable=False)
+    description = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
 class Report(Base):
     __tablename__ = "reports"
     id = Column(Integer, primary_key=True, index=True)
@@ -40,7 +60,7 @@ class Report(Base):
     # Location
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
-    geom = Column(Geometry(geometry_type='POINT', srid=4326), nullable=False)
+    geom = Column(Geometry(geometry_type='POINT', srid=4326), nullable=False) if has_postgis else Column(String(100), nullable=True)
     address = Column(String(500), nullable=True)
     
     # FKs
@@ -111,7 +131,8 @@ class Feedback(Base):
 class AIPrediction(Base):
     __tablename__ = "ai_predictions"
     id = Column(Integer, primary_key=True, index=True)
-    report_id = Column(Integer, ForeignKey("reports.id"), nullable=False)
+    report_id = Column(Integer, ForeignKey("reports.id"), nullable=True)
+    analysis_id = Column(String(100), unique=True, index=True, nullable=True)
     model_name = Column(String(100), nullable=False)
     model_version = Column(String(50), nullable=False)
     prediction_type = Column(String(100), nullable=False) # CATEGORY, SEVERITY, DUPLICATE_CHECK, RESOLUTION_VERIFY

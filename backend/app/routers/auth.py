@@ -106,6 +106,22 @@ def logout(response: Response):
     response.delete_cookie(key="refresh_token", path="/")
     return {"detail": "Logged out successfully"}
 
-@router.get("/me", response_model=schemas.UserOut)
-def get_me(current_user: User = Depends(auth.get_current_user)):
-    return current_user
+@router.get("/me")
+def get_me(request: Request, db: Session = Depends(get_db)):
+    token = request.cookies.get("access_token")
+    if not token:
+        return None
+        
+    payload = auth.verify_token(token)
+    if payload is None:
+        return None
+        
+    user_id = payload.get("sub")
+    if user_id is None:
+        return None
+        
+    user = db.query(User).filter(User.id == int(user_id)).first()
+    if user is None:
+        return None
+        
+    return schemas.UserOut.model_validate(user)

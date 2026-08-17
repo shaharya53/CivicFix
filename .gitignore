@@ -31,3 +31,5 @@ postgres_data/
 redis_data/
 ai_models/
 uploads/
+backend/uploads/
+logs/

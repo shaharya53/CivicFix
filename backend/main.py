@@ -8,7 +8,8 @@ from jose import jwt, JWTError
 
 from app.config import settings
 from app.database import init_db, get_db
-from app.routers import auth
+from fastapi.staticfiles import StaticFiles
+from app.routers import auth, reports
 from app.websocket import manager
 
 app = FastAPI(title="CivicFix Core Backend API", version="1.0.0")
@@ -22,12 +23,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+def read_root():
+    return {
+        "name": "CivicFix Core Backend API",
+        "version": "1.0.0",
+        "status": "active",
+        "documentation": "/docs"
+    }
+
 @app.on_event("startup")
 def startup_event():
     init_db()
 
 # Register API Routers
 app.include_router(auth.router, prefix="/api")
+app.include_router(reports.router, prefix="/api")
+
+# Serve uploaded static files
+import os
+os.makedirs("uploads", exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 @app.get("/api/health")
 def health_check(db: Session = Depends(get_db)):
